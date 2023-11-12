@@ -1,0 +1,33 @@
+{
+  "name": "fireblocks-staking",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main.ts",
+  "scripts": {
+    "fireblocks-staking": "npx ts-node src/main.ts",
+    "lint": "eslint --ext .js,.ts src/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "",
+  "devDependencies": {
+    "@types/node": "^20.9.0",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "eslint": "^8.53.0",
+    "eslint-config-standard-with-typescript": "^39.1.1",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-n": "^16.3.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@commander-js/extra-typings": "^11.1.0",
+    "@cosmjs/cosmwasm-stargate": "^0.31.3",
+    "@cosmjs/stargate": "^0.29.3",
+    "chalk": "^4.0.0",
+    "cosmjs-types": "^0.5.2",
+    "fireblocks-sdk": "^4.0.0",
+    "mathjs": "^11.3.2",
+    "moment": "^2.29.4"
+  }
+}
