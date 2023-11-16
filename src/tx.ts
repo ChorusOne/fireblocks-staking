@@ -52,7 +52,7 @@ function createDefaultTypes (): AminoConverters {
     ...createBankAminoConverters(),
     ...createDistributionAminoConverters(),
     ...createGovAminoConverters(),
-    ...createStakingAminoConverters('cosmos'),
+    ...createStakingAminoConverters(),
     ...createIbcAminoConverters(),
     ...createVestingAminoConverters()
   }
@@ -72,7 +72,7 @@ function toCoin (amount: string, expectedDenom: string): Coin {
     )
   }
 
-  return coin(Number(total), denom)
+  return coin(total, denom)
 }
 
 export async function genSignableTx (
@@ -103,10 +103,10 @@ export async function genSignableTx (
     })
   }
 
-  const feeAmt: number =
+  const feeAmt: bigint =
         config.network.fee ?? config.network.gasPrice * config.network.gas
   const fee: StdFee = {
-    amount: [coin(feeAmt, config.network.denom)],
+    amount: [coin(feeAmt.toString(), config.network.denom)],
     gas: config.network.gas.toString()
   }
 

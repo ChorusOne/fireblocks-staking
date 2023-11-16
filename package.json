@@ -23,7 +23,7 @@
   "dependencies": {
     "@commander-js/extra-typings": "^11.1.0",
     "@cosmjs/cosmwasm-stargate": "^0.31.3",
-    "@cosmjs/stargate": "^0.29.3",
+    "@cosmjs/stargate": "^0.31.3",
     "chalk": "^4.0.0",
     "cosmjs-types": "^0.5.2",
     "fireblocks-sdk": "^4.0.0",
