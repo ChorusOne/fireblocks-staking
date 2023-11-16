@@ -53,15 +53,15 @@ export interface NetworkConfig {
   denom: string
 
   // default TX gas e.g 200000
-  gas: number
+  gas: bigint
 
   // gas price e.g 0.4
   // https://github.com/cosmos/chain-registry/blob/master/celestia/chain.json
-  gasPrice: number
+  gasPrice: bigint
 
   // fixed fee paid for TX - this will override the gasPrice * gas = fee
   // calculation
-  fee?: number
+  fee?: bigint
 
   // block explorer URL to display Transaction ID via Web UI. Example:
   //   https://mintscan.io/celestia/tx/
