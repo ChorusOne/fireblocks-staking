@@ -140,6 +140,8 @@ export async function genSignedMsg (
       id: vault.id,
       address: delegatorAddress
     },
+    // display raw TX in Fireblocks UI
+    note: JSON.stringify(signDoc, null, 2),
     operation: TransactionOperation.RAW,
     extraParameters: {
       rawMessageData: {
