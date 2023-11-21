@@ -39,6 +39,7 @@ function makeTxCommand (): Command {
   const tx = new Command('tx')
     .description('generate a signed transaction')
     .option('-b, --broadcast', 'broadcast generated transaction', false)
+    .option('-m, --memo <memo>', 'a note attached to transaction', '')
     .option('-j, --journal <value>', 'write TX\'es to the local journal log', 'true')
 
   tx.command('delegate')
@@ -151,6 +152,7 @@ async function runDelegateOrUndelegateTx (
   cmd: Command<[string]>
 ): Promise<[StdSignDoc, Uint8Array]> {
   const broadcastEnabled = cmd.parent?.getOptionValue('broadcast') as boolean
+  const memo = cmd.parent?.getOptionValue('memo') as string
   const journalEnabled: boolean = JSON.parse(cmd.parent?.getOptionValue('journal') as string)
 
   const [config, chainID, cosmosAccount, vault, cosmosClient, signerClient] =
@@ -162,7 +164,8 @@ async function runDelegateOrUndelegateTx (
     chainID,
     amount,
     cosmosAccount.accountNumber,
-    cosmosAccount.sequence
+    cosmosAccount.sequence,
+    memo
   )
 
   print(1, 3, 'prepare unsigned transaction')

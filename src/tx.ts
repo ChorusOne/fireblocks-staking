@@ -81,7 +81,8 @@ export async function genSignableTx (
   chainID: string,
   amount: string,
   accountNumber: number,
-  accountSequence: number
+  accountSequence: number,
+  memo: string
 ): Promise<StdSignDoc> {
   const aminoTypes = new AminoTypes(createDefaultTypes())
 
@@ -114,7 +115,7 @@ export async function genSignableTx (
     [delegateMsg].map((msg) => aminoTypes.toAmino(msg)),
     fee,
     chainID,
-    '', // memo
+    memo,
     accountNumber,
     accountSequence
   )
