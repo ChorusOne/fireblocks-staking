@@ -10,6 +10,7 @@ import {
   coin, type Coin,
   type MsgDelegateEncodeObject,
   type MsgUndelegateEncodeObject,
+  type MsgWithdrawDelegatorRewardEncodeObject,
   type AminoConverters,
   AminoTypes,
   createStakingAminoConverters,
@@ -26,6 +27,7 @@ import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { fromBase64, toBase64 } from '@cosmjs/encoding'
 import { SignMode } from 'cosmjs-types/cosmos/tx/signing/v1beta1/signing'
 import { MsgDelegate } from 'cosmjs-types/cosmos/staking/v1beta1/tx'
+import { MsgWithdrawDelegatorReward } from 'cosmjs-types/cosmos/distribution/v1beta1/tx'
 import { Int53 } from '@cosmjs/math'
 import { type Config, type Signer } from './types'
 import { Sha256 } from '@cosmjs/crypto'
@@ -33,6 +35,7 @@ import { Sha256 } from '@cosmjs/crypto'
 import {
   Registry,
   type TxBodyEncodeObject,
+  type EncodeObject,
   encodePubkey,
   makeAuthInfoBytes
 } from '@cosmjs/proto-signing'
@@ -75,17 +78,26 @@ function toCoin (amount: string, expectedDenom: string): Coin {
   return coin(total, denom)
 }
 
-export async function genSignableTx (
+export function genWithdrawRewardsMsg (
+  config: Config,
+  validatorAddress: string
+): MsgWithdrawDelegatorRewardEncodeObject {
+  const withdrawRewardsMsg: MsgWithdrawDelegatorRewardEncodeObject = {
+    typeUrl: '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward',
+    value: MsgWithdrawDelegatorReward.fromPartial({
+      delegatorAddress: config.delegatorAddress,
+      validatorAddress: validatorAddress ?? config.validatorAddress
+    })
+  }
+
+  return withdrawRewardsMsg
+}
+
+export function genDelegateOrUndelegateMsg (
   config: Config,
   msgType: string,
-  chainID: string,
-  amount: string,
-  accountNumber: number,
-  accountSequence: number,
-  memo: string
-): Promise<StdSignDoc> {
-  const aminoTypes = new AminoTypes(createDefaultTypes())
-
+  amount: string
+): MsgDelegateEncodeObject | MsgUndelegateEncodeObject {
   const coins = toCoin(amount, config.network.denom)
 
   if (!['delegate', 'undelegate'].some((x) => x === msgType)) {
@@ -104,6 +116,19 @@ export async function genSignableTx (
     })
   }
 
+  return delegateMsg
+}
+
+export async function genSignableTx (
+  config: Config,
+  chainID: string,
+  msg: EncodeObject,
+  accountNumber: number,
+  accountSequence: number,
+  memo: string
+): Promise<StdSignDoc> {
+  const aminoTypes = new AminoTypes(createDefaultTypes())
+
   const feeAmt: bigint =
         config.network.fee ?? config.network.gasPrice * config.network.gas
   const fee: StdFee = {
@@ -112,7 +137,7 @@ export async function genSignableTx (
   }
 
   const signDoc = makeSignDocAmino(
-    [delegateMsg].map((msg) => aminoTypes.toAmino(msg)),
+    [msg].map((msg) => aminoTypes.toAmino(msg)),
     fee,
     chainID,
     memo,
