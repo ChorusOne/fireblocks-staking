@@ -1,12 +1,13 @@
 import { FireblocksSDK, type VaultAccountResponse } from 'fireblocks-sdk'
 import { Command } from '@commander-js/extra-typings'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
+import { type EncodeObject } from '@cosmjs/proto-signing'
 import { toBech32, fromBase64 } from '@cosmjs/encoding'
 import { promises as fsPromises } from 'fs'
 import { type Config, type Signer, type FireblocksConfig } from './types'
 import { prompt, writeJournal, readConfig, print } from './util'
 import { LocalSigner } from './signer/local'
-import { genSignedTx, genSignedMsg, genSignableTx } from './tx'
+import { genSignedTx, genSignedMsg, genSignableTx, genDelegateOrUndelegateMsg, genWithdrawRewardsMsg } from './tx'
 import {
   SigningStargateClient,
   type StargateClient,
@@ -57,6 +58,14 @@ function makeTxCommand (): Command {
       'amount of tokens to stake expressed in denom e.g 10utia'
     )
     .action(getUnbondTx)
+
+  tx.command('withdraw-rewards')
+    .description('withdraw rewards earned with given validator')
+    .argument(
+      '[validatorAddress]',
+      'address of the validator from where to claim rewards'
+    )
+    .action(getWithdrawRewardsTx)
 
   return tx
 }
@@ -145,11 +154,11 @@ async function init (
   return [config, chainID, cosmosAccount, vaults[0], cosmosClient, signer]
 }
 
-async function runDelegateOrUndelegateTx (
+async function runTx (
   msgType: string,
-  amount: string,
   options: any,
-  cmd: Command<[string]>
+  cmd: Command<[string]>,
+  arg: string
 ): Promise<[StdSignDoc, Uint8Array]> {
   const broadcastEnabled = cmd.parent?.getOptionValue('broadcast') as boolean
   const memo = cmd.parent?.getOptionValue('memo') as string
@@ -158,11 +167,25 @@ async function runDelegateOrUndelegateTx (
   const [config, chainID, cosmosAccount, vault, cosmosClient, signerClient] =
         await init(cmd)
 
+  let txMsg: EncodeObject = { typeUrl: '', value: '' }
+
+  switch (msgType) {
+    case 'delegate':
+    case 'undelegate':
+      txMsg = genDelegateOrUndelegateMsg(
+        config,
+        msgType,
+        arg // amount
+      )
+      break
+    case 'withdrawRewards':
+      txMsg = genWithdrawRewardsMsg(config, arg /* validatorAddress */)
+  }
+
   const signDoc = await genSignableTx(
     config,
-    msgType,
     chainID,
-    amount,
+    txMsg,
     cosmosAccount.accountNumber,
     cosmosAccount.sequence,
     memo
@@ -279,7 +302,7 @@ async function getDelegateTx (
   options: any,
   cmd: Command<[string]>
 ): Promise<void> {
-  await runDelegateOrUndelegateTx('delegate', amount, options, cmd)
+  await runTx('delegate', options, cmd, amount)
 }
 
 async function getUnbondTx (
@@ -287,7 +310,15 @@ async function getUnbondTx (
   options: any,
   cmd: Command<[string]>
 ): Promise<void> {
-  await runDelegateOrUndelegateTx('undelegate', amount, options, cmd)
+  await runTx('undelegate', options, cmd, amount)
+}
+
+async function getWithdrawRewardsTx (
+  validatorAddress: string,
+  options: any,
+  cmd: Command<[string]>
+): Promise<void> {
+  await runTx('withdrawRewards', options, cmd, validatorAddress)
 }
 
 (async () => {
