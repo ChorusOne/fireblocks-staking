@@ -10,6 +10,7 @@ import {
   coin, type Coin,
   type MsgDelegateEncodeObject,
   type MsgUndelegateEncodeObject,
+  type MsgBeginRedelegateEncodeObject,
   type MsgWithdrawDelegatorRewardEncodeObject,
   type AminoConverters,
   AminoTypes,
@@ -26,7 +27,7 @@ import { print } from './util'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { fromBase64, toBase64 } from '@cosmjs/encoding'
 import { SignMode } from 'cosmjs-types/cosmos/tx/signing/v1beta1/signing'
-import { MsgDelegate } from 'cosmjs-types/cosmos/staking/v1beta1/tx'
+import { MsgBeginRedelegate, MsgDelegate } from 'cosmjs-types/cosmos/staking/v1beta1/tx'
 import { MsgWithdrawDelegatorReward } from 'cosmjs-types/cosmos/distribution/v1beta1/tx'
 import { Int53 } from '@cosmjs/math'
 import { type Config, type Signer } from './types'
@@ -117,6 +118,26 @@ export function genDelegateOrUndelegateMsg (
   }
 
   return delegateMsg
+}
+
+export function genBeginRedelegateMsg (
+  config: Config,
+  amount: string,
+  validatorDstAddress: string
+): MsgBeginRedelegateEncodeObject {
+  const coins = toCoin(amount, config.network.denom)
+
+  const beginRedelegateMsg: MsgBeginRedelegateEncodeObject = {
+    typeUrl: '/cosmos.staking.v1beta1.MsgBeginRedelegate',
+    value: MsgBeginRedelegate.fromPartial({
+      delegatorAddress: config.delegatorAddress,
+      validatorSrcAddress: config.validatorAddress,
+      validatorDstAddress: validatorDstAddress,
+      amount: coins
+    })
+  }
+
+  return beginRedelegateMsg
 }
 
 export async function genSignableTx (

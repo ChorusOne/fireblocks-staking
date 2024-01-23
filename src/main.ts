@@ -7,7 +7,7 @@ import { promises as fsPromises } from 'fs'
 import { type Config, type Signer, type FireblocksConfig } from './types'
 import { prompt, writeJournal, readConfig, print } from './util'
 import { LocalSigner } from './signer/local'
-import { genSignedTx, genSignedMsg, genSignableTx, genDelegateOrUndelegateMsg, genWithdrawRewardsMsg } from './tx'
+import { genSignedTx, genSignedMsg, genSignableTx, genDelegateOrUndelegateMsg, genBeginRedelegateMsg, genWithdrawRewardsMsg } from './tx'
 import {
   SigningStargateClient,
   type StargateClient,
@@ -59,6 +59,18 @@ function makeTxCommand (): Command {
     )
     .action(getUnbondTx)
 
+  tx.command('redelegate')
+    .description('redelegate funds to another validator')
+    .argument(
+      '<amount>',
+      'amount of tokens to stake expressed in denom e.g 10utia'
+    )
+    .argument(
+      '<validator-dst-address>',
+      'validator address to redelegate funds to'
+    )
+    .action(getRedelegateTx)
+
   tx.command('withdraw-rewards')
     .description('withdraw rewards earned with given validator')
     .argument(
@@ -101,7 +113,7 @@ async function newSigner (config: Config, signerType: SignerType): Promise<Signe
 }
 
 async function init (
-  cmd: Command<[string]>
+  cmd: Command<[string]> | Command<[string, string]>
 ): Promise<
   [Config, string, Account, VaultAccountResponse, StargateClient, Signer]
   > {
@@ -157,8 +169,8 @@ async function init (
 async function runTx (
   msgType: string,
   options: any,
-  cmd: Command<[string]>,
-  arg: string
+  cmd: Command<[string]> | Command<[string, string]>,
+  arg: string[]
 ): Promise<[StdSignDoc, Uint8Array]> {
   const broadcastEnabled = cmd.parent?.getOptionValue('broadcast') as boolean
   const memo = cmd.parent?.getOptionValue('memo') as string
@@ -175,11 +187,18 @@ async function runTx (
       txMsg = genDelegateOrUndelegateMsg(
         config,
         msgType,
-        arg // amount
+        arg[0] // amount
+      )
+      break
+    case 'redelegate':
+      txMsg = genBeginRedelegateMsg(
+        config,
+        arg[0], // amount
+        arg[1] // validatorDstAddress
       )
       break
     case 'withdrawRewards':
-      txMsg = genWithdrawRewardsMsg(config, arg /* validatorAddress */)
+      txMsg = genWithdrawRewardsMsg(config, arg[0] /* validatorAddress */)
   }
 
   const signDoc = await genSignableTx(
@@ -302,7 +321,7 @@ async function getDelegateTx (
   options: any,
   cmd: Command<[string]>
 ): Promise<void> {
-  await runTx('delegate', options, cmd, amount)
+  await runTx('delegate', options, cmd, [amount])
 }
 
 async function getUnbondTx (
@@ -310,7 +329,16 @@ async function getUnbondTx (
   options: any,
   cmd: Command<[string]>
 ): Promise<void> {
-  await runTx('undelegate', options, cmd, amount)
+  await runTx('undelegate', options, cmd, [amount])
+}
+
+async function getRedelegateTx (
+  amount: string,
+  validatorDstAddress: string,
+  options: any,
+  cmd: Command<[string, string]>
+): Promise<void> {
+  await runTx('redelegate', options, cmd, [amount, validatorDstAddress])
 }
 
 async function getWithdrawRewardsTx (
@@ -318,7 +346,7 @@ async function getWithdrawRewardsTx (
   options: any,
   cmd: Command<[string]>
 ): Promise<void> {
-  await runTx('withdrawRewards', options, cmd, validatorAddress)
+  await runTx('withdrawRewards', options, cmd, [validatorAddress])
 }
 
 (async () => {
