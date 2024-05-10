@@ -7,11 +7,6 @@ import {
   type TransactionResponse
 } from 'fireblocks-sdk'
 
-export enum SignerType {
-  FIREBLOCKS = 'fireblocks',
-  LOCAL = 'local'
-}
-
 export interface Config {
   // define validator address to interact with (delegate, undelegate etc)
   validatorAddress: string
