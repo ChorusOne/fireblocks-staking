@@ -23,14 +23,14 @@ import {
   createVestingAminoConverters,
   defaultRegistryTypes
 } from '@cosmjs/stargate'
-import { print } from './util'
+import { print } from '../util'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { fromBase64, toBase64 } from '@cosmjs/encoding'
 import { SignMode } from 'cosmjs-types/cosmos/tx/signing/v1beta1/signing'
 import { MsgBeginRedelegate, MsgDelegate } from 'cosmjs-types/cosmos/staking/v1beta1/tx'
 import { MsgWithdrawDelegatorReward } from 'cosmjs-types/cosmos/distribution/v1beta1/tx'
 import { Int53 } from '@cosmjs/math'
-import { type Config, type Signer } from './types'
+import { type Config, type Signer } from '../types'
 import { Sha256 } from '@cosmjs/crypto'
 
 import {
@@ -132,7 +132,7 @@ export function genBeginRedelegateMsg (
     value: MsgBeginRedelegate.fromPartial({
       delegatorAddress: config.delegatorAddress,
       validatorSrcAddress: config.validatorAddress,
-      validatorDstAddress: validatorDstAddress,
+      validatorDstAddress,
       amount: coins
     })
   }

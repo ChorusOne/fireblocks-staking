@@ -77,12 +77,12 @@ Please note that unless you pass the `--broadcast` flag, your transaction will n
 
 To delegate your funds (e.g., `1000000utia`), execute the following command:
 ```
-npm run fireblocks-staking -- tx delegate <amount> --broadcast
+npm run fireblocks-staking -- cosmos tx delegate <amount> --broadcast
 ```
 
 To unbond funds, use the following command:
 ```
-npm run fireblocks-staking -- tx unbond <amount> --broadcast
+npm run fireblocks-staking -- cosmos tx unbond <amount> --broadcast
 ```
 
 As mentioned in the "How does it work?" section, the CLI is interactive. It will prompt you before signing a transaction and broadcasting it, allowing you time to review its contents.
