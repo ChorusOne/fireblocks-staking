@@ -1,9 +1,5 @@
 import {
-  PeerType,
-  TransactionOperation,
-  type TransactionArguments,
   type SignedMessageResponse,
-  TransactionStatus,
   type VaultAccountResponse
 } from 'fireblocks-sdk'
 import {
@@ -23,14 +19,14 @@ import {
   createVestingAminoConverters,
   defaultRegistryTypes
 } from '@cosmjs/stargate'
-import { print } from '../util'
+import { type Signer } from '../fireblocks/signer'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { fromBase64, toBase64 } from '@cosmjs/encoding'
 import { SignMode } from 'cosmjs-types/cosmos/tx/signing/v1beta1/signing'
 import { MsgBeginRedelegate, MsgDelegate } from 'cosmjs-types/cosmos/staking/v1beta1/tx'
 import { MsgWithdrawDelegatorReward } from 'cosmjs-types/cosmos/distribution/v1beta1/tx'
 import { Int53 } from '@cosmjs/math'
-import { type Config, type Signer } from '../types'
+import { type Config } from '../types'
 import { Sha256 } from '@cosmjs/crypto'
 
 import {
@@ -170,7 +166,7 @@ export async function genSignableTx (
 }
 
 export async function genSignedMsg (
-  fireblocksClient: Signer,
+  signer: Signer,
   signDoc: StdSignDoc,
   vault: VaultAccountResponse,
   delegatorAddress: string,
@@ -178,58 +174,9 @@ export async function genSignedMsg (
 ): Promise<SignedMessageResponse> {
   const msg = new Sha256(serializeSignDoc(signDoc)).digest()
   const hexMsg = Buffer.from(msg).toString('hex')
+  const note = JSON.stringify(signDoc, null, 2)
 
-  const args: TransactionArguments = {
-    assetId,
-    source: {
-      type: PeerType.VAULT_ACCOUNT,
-      id: vault.id,
-      address: delegatorAddress
-    },
-    // display raw TX in Fireblocks UI
-    note: JSON.stringify(signDoc, null, 2),
-    operation: TransactionOperation.RAW,
-    extraParameters: {
-      rawMessageData: {
-        messages: [
-          {
-            content: hexMsg
-          }
-        ]
-      }
-    }
-  }
-
-  // https://developers.fireblocks.com/docs/raw-message-signing
-  print(2, 3, 'wait for the TX signature from the remote signer')
-  let { status, id } = await fireblocksClient.createTransaction(args)
-
-  let txInfo = await fireblocksClient.getTransactionById(id)
-  status = txInfo.status
-
-  const states = [
-    TransactionStatus.COMPLETED,
-    TransactionStatus.FAILED,
-    TransactionStatus.BLOCKED
-  ]
-
-  while (!states.some((x) => x === status)) {
-    try {
-      console.log(`* signer request ID: ${id} with status: ${status}`)
-      txInfo = await fireblocksClient.getTransactionById(id)
-
-      status = txInfo.status
-    } catch (err) {
-      console.error('probing remote signer failed', err)
-    }
-
-    await new Promise((resolve, reject) => setTimeout(resolve, 1000))
-  }
-
-  const details = txInfo.subStatus === '' ? 'none' : txInfo.subStatus
-  console.log(
-    `* signer request ID finished with status ${status}; details: ${details}`
-  )
+  const txInfo = await signer.sign(vault, assetId, delegatorAddress, hexMsg, note)
 
   if (txInfo.signedMessages === undefined || txInfo.signedMessages?.length === 0) {
     throw new Error("fireblocks didn't return any signed message, but it should")

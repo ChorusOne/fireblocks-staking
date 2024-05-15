@@ -3,7 +3,8 @@ import { Command } from '@commander-js/extra-typings'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { type EncodeObject } from '@cosmjs/proto-signing'
 import { toBech32, fromBase64 } from '@cosmjs/encoding'
-import { type Config, type Signer } from '../types'
+import { type Config, type SignerBackend } from '../types'
+import { Signer } from '../fireblocks/signer'
 import { type SignerType } from '../enums'
 import { prompt, writeJournal, readConfig, print } from '../util'
 import { genSignedTx, genSignedMsg, genSignableTx, genDelegateOrUndelegateMsg, genBeginRedelegateMsg, genWithdrawRewardsMsg } from './tx'
@@ -83,7 +84,8 @@ async function init (
     cmd.error(e, { exitCode: 1, code: 'delegate.config.fs' })
   })
 
-  const signer: Signer = await newSigner(config, signerType as SignerType)
+  const signerBackend: SignerBackend = await newSigner(config, signerType as SignerType)
+  const signer = new Signer(signerBackend)
 
   const cosmosClient = await newCosmosClient(config.network.rpcUrl).catch(
     (e) => {
@@ -104,7 +106,7 @@ async function init (
   const chainID: string = await cosmosClient.getChainId()
 
   const vaultName = config.fireblocks.vaultName
-  const vaults = await signer
+  const vaults = await signerBackend
     .getVaultAccountsWithPageInfo({
       namePrefix: vaultName
     })

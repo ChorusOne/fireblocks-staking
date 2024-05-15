@@ -69,7 +69,7 @@ export interface LocalSigner {
   mnemonicPath: string
 }
 
-export interface Signer {
+export interface SignerBackend {
   getVaultAccountsWithPageInfo: (
     pagedVaultAccountsRequestFilters: PagedVaultAccountsRequestFilters,
   ) => Promise<PagedVaultAccountsResponse>
