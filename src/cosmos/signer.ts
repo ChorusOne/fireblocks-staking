@@ -1,6 +1,6 @@
 import { promises as fsPromises } from 'fs'
 import { Secp256k1, Bip39, EnglishMnemonic, Slip10, Slip10Curve } from '@cosmjs/crypto'
-import { type Signer } from '../types'
+import { type SignerBackend } from '../types'
 import {
   type PagedVaultAccountsRequestFilters,
   type PagedVaultAccountsResponse,
@@ -43,7 +43,7 @@ export async function getPrivPubKey (
   return { privkey, pubkey: Secp256k1.compressPubkey(pubkey) }
 }
 
-export class LocalSigner implements Signer {
+export class LocalSigner implements SignerBackend {
   private readonly pubkey: Uint8Array
   private readonly privkey: Uint8Array
   private readonly vaultName: string
