@@ -29,22 +29,20 @@ export function journal (type: string, dataFn?: Fn) {
         data = dataFn(data)
       }
 
-      await writeJournal({
-        type,
-        timestamp: Math.floor(Date.now() / 1000),
-        data: JSON.stringify(data, null, 2)
-      }, this.withJournal)
+      if (this.withJournal === true) {
+        await writeJournal({
+          type,
+          timestamp: Math.floor(Date.now() / 1000),
+          data: JSON.stringify(data, null, 2)
+        })
+      }
 
       return result
     }
   }
 }
 
-async function writeJournal (entry: JournalEntry, enabled: boolean): Promise<void> {
-  if (!enabled) {
-    return
-  }
-
+async function writeJournal (entry: JournalEntry): Promise<void> {
   let journal: Journal = { entries: [] }
   if (await fileExists('./journal.log')) {
     const journalFile = await fsPromises.readFile('./journal.log', 'utf-8')
