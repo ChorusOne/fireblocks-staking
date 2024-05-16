@@ -19,14 +19,14 @@ import {
   createVestingAminoConverters,
   defaultRegistryTypes
 } from '@cosmjs/stargate'
-import { type Signer } from '../fireblocks/signer'
+import { type Signer } from '../signer'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { fromBase64, toBase64 } from '@cosmjs/encoding'
 import { SignMode } from 'cosmjs-types/cosmos/tx/signing/v1beta1/signing'
 import { MsgBeginRedelegate, MsgDelegate } from 'cosmjs-types/cosmos/staking/v1beta1/tx'
 import { MsgWithdrawDelegatorReward } from 'cosmjs-types/cosmos/distribution/v1beta1/tx'
 import { Int53 } from '@cosmjs/math'
-import { type Config } from '../types'
+import { type NetworkConfig, type Config } from '../types'
 import { Sha256 } from '@cosmjs/crypto'
 
 import {
@@ -137,20 +137,20 @@ export function genBeginRedelegateMsg (
 }
 
 export async function genSignableTx (
-  config: Config,
+  networkConfig: NetworkConfig,
   chainID: string,
   msg: EncodeObject,
   accountNumber: number,
   accountSequence: number,
-  memo: string
+  memo?: string
 ): Promise<StdSignDoc> {
   const aminoTypes = new AminoTypes(createDefaultTypes())
 
   const feeAmt: bigint =
-        config.network.fee ?? config.network.gasPrice * config.network.gas
+        networkConfig.fee ?? networkConfig.gasPrice * networkConfig.gas
   const fee: StdFee = {
-    amount: [coin(feeAmt.toString(), config.network.denom)],
-    gas: config.network.gas.toString()
+    amount: [coin(feeAmt.toString(), networkConfig.denom)],
+    gas: networkConfig.gas.toString()
   }
 
   const signDoc = makeSignDocAmino(

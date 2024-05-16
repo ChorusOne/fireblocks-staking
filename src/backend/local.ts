@@ -19,31 +19,7 @@ import {
   type Secp256k1HdWalletOptions
 } from '@cosmjs/amino'
 
-export async function getPrivPubKey (
-  mnemonicPath: string,
-  bechPrefix: string
-): Promise<{ privkey: Uint8Array, pubkey: Uint8Array }> {
-  const defaultOptions: Secp256k1HdWalletOptions = {
-    bip39Password: '',
-    hdPaths: [makeCosmoshubPath(0)],
-    prefix: bechPrefix
-  }
-
-  const mnemonic = (await fsPromises.readFile(mnemonicPath, 'utf-8')).trim()
-  const mnemonicChecked = new EnglishMnemonic(mnemonic)
-  const seed = await Bip39.mnemonicToSeed(mnemonicChecked, '')
-
-  const { privkey } = Slip10.derivePath(
-    Slip10Curve.Secp256k1,
-    seed,
-    defaultOptions.hdPaths[0]
-  )
-  const { pubkey } = await Secp256k1.makeKeypair(privkey)
-
-  return { privkey, pubkey: Secp256k1.compressPubkey(pubkey) }
-}
-
-export class LocalSigner implements SignerBackend {
+export class LocalSignerBackend implements SignerBackend {
   private readonly pubkey: Uint8Array
   private readonly privkey: Uint8Array
   private readonly vaultName: string
@@ -59,10 +35,10 @@ export class LocalSigner implements SignerBackend {
     mnemonicPath: string,
     vaultName: string,
     bechPrefix: string
-  ): Promise<LocalSigner> {
+  ): Promise<LocalSignerBackend> {
     const { privkey, pubkey } = await getPrivPubKey(mnemonicPath, bechPrefix)
 
-    return new LocalSigner(privkey, pubkey, vaultName)
+    return new LocalSignerBackend(privkey, pubkey, vaultName)
   }
 
   public async getVaultAccountsWithPageInfo (
@@ -152,4 +128,28 @@ export class LocalSigner implements SignerBackend {
       ]
     })
   }
+}
+
+export async function getPrivPubKey (
+  mnemonicPath: string,
+  bechPrefix: string
+): Promise<{ privkey: Uint8Array, pubkey: Uint8Array }> {
+  const defaultOptions: Secp256k1HdWalletOptions = {
+    bip39Password: '',
+    hdPaths: [makeCosmoshubPath(0)],
+    prefix: bechPrefix
+  }
+
+  const mnemonic = (await fsPromises.readFile(mnemonicPath, 'utf-8')).trim()
+  const mnemonicChecked = new EnglishMnemonic(mnemonic)
+  const seed = await Bip39.mnemonicToSeed(mnemonicChecked, '')
+
+  const { privkey } = Slip10.derivePath(
+    Slip10Curve.Secp256k1,
+    seed,
+    defaultOptions.hdPaths[0]
+  )
+  const { pubkey } = await Secp256k1.makeKeypair(privkey)
+
+  return { privkey, pubkey: Secp256k1.compressPubkey(pubkey) }
 }

@@ -10,7 +10,37 @@ async function fileExists (path: string): Promise<boolean> {
     .catch(() => false)
 }
 
-export async function writeJournal (entry: JournalEntry, enabled: boolean): Promise<void> {
+type Fn = (s1: any) => any
+
+// write a decorator function called journal that logs the result of a method
+export function journal (type: string, dataFn?: Fn) {
+  return function (
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor
+  ): void {
+    const originalMethod = descriptor.value
+
+    descriptor.value = async function (...args: any[]) {
+      const result = await originalMethod.apply(this, args)
+
+      let data = result
+      if (dataFn !== undefined) {
+        data = dataFn(data)
+      }
+
+      await writeJournal({
+        type,
+        timestamp: Math.floor(Date.now() / 1000),
+        data: JSON.stringify(data, null, 2)
+      }, this.withJournal)
+
+      return result
+    }
+  }
+}
+
+async function writeJournal (entry: JournalEntry, enabled: boolean): Promise<void> {
   if (!enabled) {
     return
   }
