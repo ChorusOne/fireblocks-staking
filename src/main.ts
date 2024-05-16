@@ -1,5 +1,5 @@
 import { Command } from '@commander-js/extra-typings'
-import { makeCosmosCommand } from './cosmos/cosmos'
+import { makeCosmosCommand } from './cosmos/cmd'
 
 const program = new Command()
 

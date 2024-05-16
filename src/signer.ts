@@ -6,15 +6,15 @@ import {
   TransactionStatus,
   type VaultAccountResponse
 } from 'fireblocks-sdk'
-import { print } from '../util'
+import { print } from './util'
 
-import { type SignerBackend } from '../types'
+import { type SignerBackend } from './types'
 
 export class Signer {
-  private readonly rawSigner: SignerBackend
+  private readonly signerBackend: SignerBackend
 
-  constructor (rawSigner: SignerBackend) {
-    this.rawSigner = rawSigner
+  constructor (signerBackend: SignerBackend) {
+    this.signerBackend = signerBackend
   }
 
   async sign (vault: VaultAccountResponse, assetId: string, delegatorAddress: string, content: string, note: string): Promise<TransactionResponse> {
@@ -40,9 +40,9 @@ export class Signer {
 
     // https://developers.fireblocks.com/docs/raw-message-signing
     print(2, 3, 'wait for the TX signature from the remote signer')
-    let { status, id } = await this.rawSigner.createTransaction(args)
+    let { status, id } = await this.signerBackend.createTransaction(args)
 
-    let txInfo = await this.rawSigner.getTransactionById(id)
+    let txInfo = await this.signerBackend.getTransactionById(id)
     status = txInfo.status
 
     const states = [
@@ -54,7 +54,7 @@ export class Signer {
     while (!states.some((x) => x === status)) {
       try {
         console.log(`* signer request ID: ${id} with status: ${status}`)
-        txInfo = await this.rawSigner.getTransactionById(id)
+        txInfo = await this.signerBackend.getTransactionById(id)
 
         status = txInfo.status
       } catch (err) {
@@ -70,5 +70,24 @@ export class Signer {
     )
 
     return txInfo
+  }
+
+  async getVault (vaultName: string): Promise<VaultAccountResponse> {
+    const vaults = await this.signerBackend
+      .getVaultAccountsWithPageInfo({
+        namePrefix: vaultName
+      })
+      .then((res) => {
+        return res.accounts.filter((account) => account.name === vaultName)
+      })
+
+    if (vaults.length !== 1) {
+      throw new Error(
+        'fireblocks vault name not found, expecte exactly 1 result, got: ' +
+                  vaults.length
+      )
+    }
+
+    return vaults[0]
   }
 }

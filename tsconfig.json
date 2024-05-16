@@ -5,6 +5,7 @@
     "outDir": "out",
     "sourceMap": true,
     "esModuleInterop": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "experimentalDecorators": true
   }
 }
