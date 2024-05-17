@@ -26,8 +26,9 @@ import { SignMode } from 'cosmjs-types/cosmos/tx/signing/v1beta1/signing'
 import { MsgBeginRedelegate, MsgDelegate } from 'cosmjs-types/cosmos/staking/v1beta1/tx'
 import { MsgWithdrawDelegatorReward } from 'cosmjs-types/cosmos/distribution/v1beta1/tx'
 import { Int53 } from '@cosmjs/math'
-import { type NetworkConfig, type Config } from '../types'
+import type { CosmosNetworkConfig, Config } from '../types'
 import { Sha256 } from '@cosmjs/crypto'
+import { getNetworkConfig } from '../util'
 
 import {
   Registry,
@@ -95,7 +96,8 @@ export function genDelegateOrUndelegateMsg (
   msgType: string,
   amount: string
 ): MsgDelegateEncodeObject | MsgUndelegateEncodeObject {
-  const coins = toCoin(amount, config.network.denom)
+  const networkConfig = getNetworkConfig<CosmosNetworkConfig>(config)
+  const coins = toCoin(amount, networkConfig.denom)
 
   if (!['delegate', 'undelegate'].some((x) => x === msgType)) {
     throw new Error('invalid type: ' + msgType)
@@ -121,7 +123,8 @@ export function genBeginRedelegateMsg (
   amount: string,
   validatorDstAddress: string
 ): MsgBeginRedelegateEncodeObject {
-  const coins = toCoin(amount, config.network.denom)
+  const networkConfig = getNetworkConfig<CosmosNetworkConfig>(config)
+  const coins = toCoin(amount, networkConfig.denom)
 
   const beginRedelegateMsg: MsgBeginRedelegateEncodeObject = {
     typeUrl: '/cosmos.staking.v1beta1.MsgBeginRedelegate',
@@ -137,7 +140,7 @@ export function genBeginRedelegateMsg (
 }
 
 export async function genSignableTx (
-  networkConfig: NetworkConfig,
+  networkConfig: CosmosNetworkConfig,
   chainID: string,
   msg: EncodeObject,
   accountNumber: number,

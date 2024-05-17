@@ -14,7 +14,9 @@
         "mnemonicPath": "./mnemonic"
     },
 
-    "network": {
+    "networkType": "cosmos",
+
+    "cosmos": {
         "rpcUrl": "https://celestia.chorus.one:443",
         "bechPrefix": "celestia",
         "denom": "utia",

@@ -2,6 +2,7 @@ import * as readline from 'readline'
 import chalk from 'chalk'
 import { promises as fsPromises } from 'fs'
 import { type Journal, type JournalEntry, type Config } from './types'
+import { NetworkType } from './enums'
 
 async function fileExists (path: string): Promise<boolean> {
   return await fsPromises
@@ -63,6 +64,25 @@ export async function readConfig (path: string): Promise<Config> {
   const cfg: Config = JSON.parse(configFile)
 
   return cfg
+}
+
+export function getNetworkConfig<T> (cfg: Config): T {
+  if (cfg.networkType === undefined) {
+    throw new Error('networkType is missing in configuration')
+  }
+
+  switch (cfg.networkType) {
+    case NetworkType.NEAR:
+      if (cfg.near === undefined) {
+        throw new Error('near configuration is missing')
+      }
+      return cfg.near as T
+    case NetworkType.COSMOS:
+      if (cfg.cosmos === undefined) {
+        throw new Error('cosmos configuration is missing')
+      }
+      return cfg.cosmos as T
+  }
 }
 
 export async function prompt (ask: string): Promise<boolean> {
