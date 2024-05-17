@@ -1,8 +1,8 @@
 import { Command } from '@commander-js/extra-typings'
-import { type Config, type SignerBackend } from '../types'
+import type { Config, SignerBackend, CosmosNetworkConfig } from '../types'
 import { Signer } from '../signer'
 import { type SignerType } from '../enums'
-import { prompt, readConfig, print } from '../util'
+import { prompt, readConfig, getNetworkConfig, print } from '../util'
 import { newSignerBackend } from '../backend/backend'
 import { CosmosStaker } from './staker'
 
@@ -153,11 +153,12 @@ async function runTx (
       )
     )
 
-    if (config.network.blockExplorerUrl !== undefined) {
+    const networkConfig = getNetworkConfig<CosmosNetworkConfig>(config)
+    if (networkConfig.blockExplorerUrl !== undefined) {
       console.log(
         '\nCheck TX status here: ' +
-                    config.network.blockExplorerUrl +
-                    result.transactionHash
+        networkConfig.blockExplorerUrl +
+        result.transactionHash
       )
     }
 

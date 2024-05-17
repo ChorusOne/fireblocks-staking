@@ -7,6 +7,8 @@ import {
   type TransactionResponse
 } from 'fireblocks-sdk'
 
+import { type NetworkType } from './enums'
+
 export interface Config {
   // define validator address to interact with (delegate, undelegate etc)
   validatorAddress: string
@@ -20,7 +22,12 @@ export interface Config {
   // use local signer (used for testing)
   localsigner: LocalSigner
 
-  network: NetworkConfig
+  // the network type to interact with
+  networkType: NetworkType
+
+  // network specific configuration
+  cosmos?: CosmosNetworkConfig
+  near?: NearNetworkConfig
 }
 
 export interface FireblocksConfig {
@@ -37,7 +44,11 @@ export interface FireblocksConfig {
   assetId: string
 }
 
-export interface NetworkConfig {
+export interface NearNetworkConfig {
+  rpcUrl: string
+}
+
+export interface CosmosNetworkConfig {
   // e.g. https://celestia.chorus.one:443 - the :port is required
   rpcUrl: string
 

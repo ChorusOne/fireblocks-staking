@@ -4,3 +4,8 @@ export enum SignerType {
   FIREBLOCKS = 'fireblocks',
   LOCAL = 'local'
 }
+
+export enum NetworkType {
+  COSMOS = 'cosmos',
+  NEAR = 'near'
+}

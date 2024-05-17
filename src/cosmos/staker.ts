@@ -8,8 +8,8 @@ import {
 } from '@cosmjs/amino'
 import { type Signer } from '../signer'
 import { genSignedTx, genSignedMsg, genSignableTx, genDelegateOrUndelegateMsg, genBeginRedelegateMsg, genWithdrawRewardsMsg } from './tx'
-import { prompt, print, journal } from '../util'
-import { type Config } from '../types'
+import { prompt, print, journal, getNetworkConfig } from '../util'
+import type { Config, CosmosNetworkConfig } from '../types'
 import { type EncodeObject } from '@cosmjs/proto-signing'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { rawSecp256k1PubkeyToRawAddress } from '@cosmjs/amino'
@@ -19,22 +19,24 @@ import { type VaultAccountResponse } from 'fireblocks-sdk'
 
 export class CosmosStaker {
   private readonly signer: Signer
-  private cosmosClient: StargateClient
   private readonly config: Config
+  private readonly networkConfig: CosmosNetworkConfig
   private readonly withJournal: boolean
 
   private chainID: string
   private cosmosAccount: Account
+  private cosmosClient: StargateClient
   private vault: VaultAccountResponse
 
   constructor (signer: Signer, config: Config, withJournal: boolean) {
     this.signer = signer
     this.config = config
+    this.networkConfig = getNetworkConfig<CosmosNetworkConfig>(config)
     this.withJournal = withJournal
   }
 
   async init (): Promise<void> {
-    const cosmosClient = await newCosmosClient(this.config.network.rpcUrl)
+    const cosmosClient = await newCosmosClient(this.networkConfig.rpcUrl)
 
     const cosmosAccount = await cosmosClient.getAccount(this.config.delegatorAddress)
     if (cosmosAccount == null) {
@@ -112,7 +114,7 @@ export class CosmosStaker {
   @journal('unsignedTx')
   async genSignableTx (chainID: string, cosmosAccount: Account, txMsg: EncodeObject, memo?: string): Promise<StdSignDoc> {
     const signDoc = await genSignableTx(
-      this.config.network,
+      this.networkConfig,
       chainID,
       txMsg,
       cosmosAccount.accountNumber,
@@ -151,7 +153,7 @@ export class CosmosStaker {
     const [signedTx, pk] = await genSignedTx(signDoc, signedMsg)
 
     const addressFromPK = toBech32(
-      this.config.network.bechPrefix,
+      this.networkConfig.bechPrefix,
       rawSecp256k1PubkeyToRawAddress(fromBase64(pk))
     )
     if (addressFromPK !== this.config.delegatorAddress) {
