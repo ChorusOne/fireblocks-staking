@@ -33,7 +33,7 @@ function makeTxCommand (): Command {
     .description('generate unbond funds to validator transaction')
     .argument(
       '<amount>',
-      'amount of tokens to stake expressed in denom e.g 0.1'
+      'amount of tokens to stake expressed in denom e.g 0.1. Zero (0) to unstake all funds.'
     )
     .action(getUnbondTx)
 

@@ -83,10 +83,19 @@ export class NearStaker {
     this.nearSigner.setNote('unstake ' + parseNearAmount(amount) + ' from ' + this.config.delegatorAddress)
     this.nearSigner.setBroadcast(broadcast)
 
+    const amnt = amountToYocto(amount)
+    let method = 'unstake'
+    let args: any = { amount: amnt }
+
+    if (BigInt(amnt) === BigInt(0)) {
+      method = 'unstake_all'
+      args = {}
+    }
+
     const response = await this.account.functionCall({
       contractId: this.config.validatorAddress,
-      methodName: 'unstake',
-      args: { amount: amountToYocto(amount) },
+      methodName: method,
+      args,
       gas: DEFAULT_FUNCTION_CALL_GAS
     })
 
