@@ -86,23 +86,31 @@ export class NearStaker {
     const response = await this.account.functionCall({
       contractId: this.config.validatorAddress,
       methodName: 'unstake',
-      args: {},
-      gas: DEFAULT_FUNCTION_CALL_GAS,
-      attachedDeposit: BigInt(amountToYocto(amount))
+      args: { amount: amountToYocto(amount) },
+      gas: DEFAULT_FUNCTION_CALL_GAS
     })
 
     return response
   }
 
-  @journal('withdrawDelegatorReward')
-  async withdrawDelegatorReward (broadcast: boolean): Promise<FinalExecutionOutcome> {
-    this.nearSigner.setNote('withdraw_all from ' + this.config.delegatorAddress)
+  @journal('withdraw')
+  async withdraw (amount: string, broadcast: boolean): Promise<FinalExecutionOutcome> {
+    const amnt = amountToYocto(amount)
+    let method = 'withdraw'
+    let args: any = { amount: amnt }
+
+    if (BigInt(amnt) === BigInt(0)) {
+      method = 'withdraw_all'
+      args = {}
+    }
+
+    this.nearSigner.setNote(method + ' from ' + this.config.delegatorAddress)
     this.nearSigner.setBroadcast(broadcast)
 
     const response = await this.account.functionCall({
       contractId: this.config.validatorAddress,
-      methodName: 'unstake',
-      args: {},
+      methodName: method,
+      args,
       gas: DEFAULT_FUNCTION_CALL_GAS,
       attachedDeposit: undefined
     })

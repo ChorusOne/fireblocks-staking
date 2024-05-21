@@ -37,13 +37,13 @@ function makeTxCommand (): Command {
     )
     .action(getUnbondTx)
 
-  tx.command('withdraw-rewards')
-    .description('withdraw rewards earned with given validator')
+  tx.command('withdraw')
+    .description('withdraw unstaked funds from the validator contract')
     .argument(
-      '[validatorAddress]',
-      'address of the validator from where to claim rewards'
+      '<amount>',
+      'amount of tokens to stake expressed in NEAR denom e.g 0.1. Zero (0) to withdraw all funds.'
     )
-    .action(getWithdrawRewardsTx)
+    .action(getWithdrawTx)
 
   return tx
 }
@@ -107,8 +107,9 @@ async function runTx (
           broadcastEnabled
         )
         break
-      case 'withdrawRewards':
-        response = await nearStaker.withdrawDelegatorReward(
+      case 'withdraw':
+        response = await nearStaker.withdraw(
+          arg[0], // amount
           broadcastEnabled
         )
         break
@@ -152,10 +153,10 @@ async function getUnbondTx (
   await runTx('undelegate', options, cmd, [amount])
 }
 
-async function getWithdrawRewardsTx (
+async function getWithdrawTx (
   validatorAddress: string,
   options: any,
   cmd: Command<[string]>
 ): Promise<void> {
-  await runTx('withdrawRewards', options, cmd, [validatorAddress])
+  await runTx('withdraw', options, cmd, [validatorAddress])
 }
