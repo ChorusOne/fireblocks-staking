@@ -4,7 +4,9 @@ import {
   type TransactionArguments,
   type RequestOptions,
   type CreateTransactionResponse,
-  type TransactionResponse
+  type TransactionResponse,
+  type PublicKeyInfoForVaultAccountArgs,
+  type PublicKeyResponse
 } from 'fireblocks-sdk'
 
 import { type NetworkType } from './enums'
@@ -45,7 +47,11 @@ export interface FireblocksConfig {
 }
 
 export interface NearNetworkConfig {
-  rpcUrl: string
+  networkId: string
+  nodeUrl: string
+  walletUrl: string
+  helperUrl: string
+  explorerUrl: string
 }
 
 export interface CosmosNetworkConfig {
@@ -91,6 +97,8 @@ export interface SignerBackend {
   ) => Promise<CreateTransactionResponse>
 
   getTransactionById: (txId: string) => Promise<TransactionResponse>
+
+  getPublicKeyInfoForVaultAccount: (args: PublicKeyInfoForVaultAccountArgs) => Promise<PublicKeyResponse>
 }
 
 export interface Journal {

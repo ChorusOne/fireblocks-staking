@@ -9,6 +9,8 @@ import {
   type CreateTransactionResponse,
   type TransactionResponse,
   type TransferPeerPathResponse,
+  type PublicKeyInfoForVaultAccountArgs,
+  type PublicKeyResponse,
   TransactionStatus,
   PeerType
 } from 'fireblocks-sdk'
@@ -127,6 +129,10 @@ export class LocalSignerBackend implements SignerBackend {
         }
       ]
     })
+  }
+
+  public async getPublicKeyInfoForVaultAccount (args: PublicKeyInfoForVaultAccountArgs): Promise<PublicKeyResponse> {
+    throw new Error('method not implemented')
   }
 }
 

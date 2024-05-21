@@ -1,5 +1,6 @@
 import { Command } from '@commander-js/extra-typings'
 import { makeCosmosCommand } from './cosmos/cmd'
+import { makeNearCommand } from './near/cmd'
 
 const program = new Command()
 
@@ -14,7 +15,8 @@ program
   )
   .version('1.0.0')
 
-program.addCommand(makeCosmosCommand());
+program.addCommand(makeCosmosCommand())
+program.addCommand(makeNearCommand());
 
 (async () => {
   await program.parseAsync()

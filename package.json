@@ -24,10 +24,13 @@
     "@commander-js/extra-typings": "^11.1.0",
     "@cosmjs/cosmwasm-stargate": "^0.31.3",
     "@cosmjs/stargate": "^0.31.3",
+    "@near-js/types": "^0.2.0",
     "chalk": "^4.0.0",
     "cosmjs-types": "^0.5.2",
     "fireblocks-sdk": "^4.0.0",
+    "js-sha256": "^0.11.0",
     "mathjs": "^11.3.2",
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "near-api-js": "^4.0.1"
   }
 }
