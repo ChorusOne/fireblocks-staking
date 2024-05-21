@@ -1,17 +1,17 @@
 # Fireblocks Staking CLI
-The Fireblocks Staking CLI is a tool designed to simplify the process of staking (or unstaking) tokens on cosmos-sdk based networks such as Celestia.
+The Fireblocks Staking CLI is a tool designed to simplify the process of staking (or unstaking) tokens on cosmos-sdk based networks such as Celestia and others.
 
 ## How does it work?
-The CLI utilizes the [Fireblocks API](https://developers.fireblocks.com/docs/api-sdk-overview) to sign a cosmos-sdk compatible transaction. Here's a brief overview of the signing flow:
+The CLI utilizes the [Fireblocks API](https://developers.fireblocks.com/docs/api-sdk-overview) to sign a blockchain compatible transaction. Here's a brief overview of the signing flow:
 
 1. The CLI parses the configuration file (`config.json`) to gather necessary information such as delegator and validator accounts, gas price etc.
-2. The CLI calls the remote Cosmos RPC endpoint to fetch data about the delegator account.
+2. The CLI calls the remote blockchain RPC endpoint to fetch data about the delegator account.
 3. The CLI calls the Fireblocks API to retrieve [Vault Account](https://developers.fireblocks.com/docs/creating-vaults-and-wallets#overview) information.
 4. Based on the RPC response and configuration, the CLI builds an unsigned transaction and prompts the user to approve its signing.
 5. Upon user approval, the CLI sends the unsigned transaction to the Fireblocks remote endpoint for signing using the [Fireblocks Raw Message Signing](https://developers.fireblocks.com/docs/raw-message-signing) feature, authenticated with the access credentials specified in the configuration file.
-6. Once the signing response is received, the CLI crafts a cosmos-sdk compatible signed transaction using the response data (Public Key and Signature).
+6. Once the signing response is received, the CLI crafts a blockchain compatible signed transaction using the response data (Public Key and Signature).
 7. The signed transaction is displayed on the screen, and the user is prompted to broadcast the transaction to the network (if the `--broadcast` flag was set).
-8. Upon user approval, the transaction is broadcasted through the cosmos-sdk RPC, and the transaction details are printed on the screen.
+8. Upon user approval, the transaction is broadcasted through the blockchain RPC, and the transaction details are printed on the screen.
 
 In addition to the above, the signed and unsigned transactions are stored in `journal.log` for troubleshooting purposes.
 
@@ -44,11 +44,12 @@ fireblocks: {
 }
 ```
 
-The network configuration is specific to the cosmos-sdk network you are using. This configuration will vary for networks like Celestia, dYdX, Cosmos Hub, etc.
+The configuration is specific to the blockchain network you are using. This configuration will vary for networks like Celestia, dYdX, Cosmos Hub, etc.
 
+### Cosmos
 Here's an example configuration for Celestia:
 ```
-{
+"cosmos": {
   "rpcUrl": "https://celestia.chorus.one:443",
   "bechPrefix": "celestia",
   "denom": "utia",
@@ -71,6 +72,18 @@ fee = gas * gasPrice
 All amounts specified in the transaction must be expressed in the `denom` (e.g., `utia` for Celestia).
 
 If you are unsure about any of the configuration parameters, you can check the `src/types.d.ts` file and refer to the comments for clarification.
+
+### NEAR
+Here's an example configuration for NEAR mainnet:
+```
+"near": {
+    "networkId": "mainnet",
+    "nodeUrl": "https://rpc.near.org",
+    "walletUrl": "https://wallet.near.org",
+    "helperUrl": "https://helper.near.org",
+    "explorerUrl": "https://nearblocks.io/txns/"
+}
+```
 
 ## Usage
 Please note that unless you pass the `--broadcast` flag, your transaction will not be sent to the network. Signing a transaction and broadcasting it are two separate actions. Therefore, having a signed transaction does not affect your account unless it is broadcasted and processed by the network.

@@ -4,14 +4,16 @@ import {
   type TransactionResponse,
   type TransactionArguments,
   TransactionStatus,
-  type VaultAccountResponse
+  type VaultAccountResponse,
+  type PublicKeyInfoForVaultAccountArgs,
+  type PublicKeyResponse
 } from 'fireblocks-sdk'
 import { print } from './util'
 
 import { type SignerBackend } from './types'
 
 export class Signer {
-  private readonly signerBackend: SignerBackend
+  readonly signerBackend: SignerBackend
 
   constructor (signerBackend: SignerBackend) {
     this.signerBackend = signerBackend
@@ -89,5 +91,22 @@ export class Signer {
     }
 
     return vaults[0]
+  }
+
+  async getPublicKey (vault: VaultAccountResponse, assetId: string): Promise<string> {
+    const pubKeyArgs: PublicKeyInfoForVaultAccountArgs = {
+      assetId,
+      vaultAccountId: Number.parseInt(vault.id),
+      change: 0,
+      addressIndex: 0
+    }
+
+    const pubKeyResponse: PublicKeyResponse = await this.signerBackend.getPublicKeyInfoForVaultAccount(pubKeyArgs)
+    const expectedAlgorithm = 'MPC_EDDSA_ED25519'
+    if (pubKeyResponse.algorithm !== expectedAlgorithm) {
+      throw new Error(`expected algorithm is not ${expectedAlgorithm} but ${pubKeyResponse.algorithm}`)
+    }
+
+    return pubKeyResponse.publicKey
   }
 }
