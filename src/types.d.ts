@@ -1,15 +1,16 @@
-import {
-  type PagedVaultAccountsRequestFilters,
-  type PagedVaultAccountsResponse,
-  type TransactionArguments,
-  type RequestOptions,
-  type CreateTransactionResponse,
-  type TransactionResponse,
-  type PublicKeyInfoForVaultAccountArgs,
-  type PublicKeyResponse
+import type {
+  PagedVaultAccountsRequestFilters,
+  PagedVaultAccountsResponse,
+  TransactionArguments,
+  RequestOptions,
+  CreateTransactionResponse,
+  TransactionResponse,
+  PublicKeyInfoForVaultAccountArgs,
+  PublicKeyResponse,
+  DepositAddressResponse
 } from 'fireblocks-sdk'
 
-import { type NetworkType } from './enums'
+import type { NetworkType, RewardDestination } from './enums'
 
 export interface Config {
   // define validator address to interact with (delegate, undelegate etc)
@@ -30,6 +31,7 @@ export interface Config {
   // network specific configuration
   cosmos?: CosmosNetworkConfig
   near?: NearNetworkConfig
+  substrate?: SubstrateNetworkConfig
 }
 
 export interface FireblocksConfig {
@@ -81,6 +83,24 @@ export interface CosmosNetworkConfig {
   blockExplorerUrl?: string
 }
 
+export interface SubstrateNetworkConfig {
+  // e.g. wss://rpc.polkadot.io
+  rpcUrl: string
+
+  // block explorer URL to display Transaction ID via Web UI. Example:
+  // * https://westend.subscan.io/account
+  blockExplorerUrl: string
+
+  // the input amount of tokens is multiplied by this value to get the amount
+  // in the smallest unit of the token. e.g.
+  //  * 1000000000000 for testnet
+  //  * 10000000000 for mainnet
+  denomMultiplier: number
+
+  // Stash or Controller (likely u want Stash)
+  rewardDestination: RewardDestination
+}
+
 export interface LocalSigner {
   // a file containing delegator mnemonic
   mnemonicPath: string
@@ -99,6 +119,8 @@ export interface SignerBackend {
   getTransactionById: (txId: string) => Promise<TransactionResponse>
 
   getPublicKeyInfoForVaultAccount: (args: PublicKeyInfoForVaultAccountArgs) => Promise<PublicKeyResponse>
+
+  getDepositAddresses: (vaultAccountId: string, assetId: string) => Promise<DepositAddressResponse[]>
 }
 
 export interface Journal {

@@ -7,5 +7,11 @@ export enum SignerType {
 
 export enum NetworkType {
   COSMOS = 'cosmos',
-  NEAR = 'near'
+  NEAR = 'near',
+  SUBSTRATE = 'substrate'
+}
+
+export enum RewardDestination {
+  STASH = 'Stash',
+  CONTROLLER = 'Controller'
 }
