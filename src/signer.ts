@@ -109,4 +109,10 @@ export class Signer {
 
     return pubKeyResponse.publicKey
   }
+
+  async getDepositAddress (vaultAccountId: string, assetId: string): Promise<string> {
+    const response = await this.signerBackend.getDepositAddresses(vaultAccountId, assetId)
+
+    return response[0].address
+  }
 }

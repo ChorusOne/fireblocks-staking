@@ -82,6 +82,11 @@ export function getNetworkConfig<T> (cfg: Config): T {
         throw new Error('cosmos configuration is missing')
       }
       return cfg.cosmos as T
+    case NetworkType.SUBSTRATE:
+      if (cfg.substrate === undefined) {
+        throw new Error('substrate configuration is missing')
+      }
+      return cfg.substrate as T
   }
 }
 
