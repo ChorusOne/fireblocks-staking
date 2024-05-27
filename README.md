@@ -85,6 +85,21 @@ Here's an example configuration for NEAR mainnet:
 }
 ```
 
+### Substrate (Polkadot, Kusama, ...)
+Here's and example configuration for Polkadot testnet (Westend):
+```
+"substrate": {
+    "rpcUrl": "wss://westend.public.curie.radiumblock.co/ws",
+    "denomMultiplier": 1000000000000,
+    "rewardDestination": "Stash",
+    "blockExplorerUrl": "https://westend.subscan.io/account"
+}
+```
+
+Please note that staking in Substrate networks requires multiple transactions. This is:
+1. `bond` - to bond the initial amount of tokens (use `bond-extra` if you wish to stake more tokens but you already run `bond`)
+2. `nominate` - nominates the stake to a validator address present in the config
+
 ## Usage
 Please note that unless you pass the `--broadcast` flag, your transaction will not be sent to the network. Signing a transaction and broadcasting it are two separate actions. Therefore, having a signed transaction does not affect your account unless it is broadcasted and processed by the network.
 
