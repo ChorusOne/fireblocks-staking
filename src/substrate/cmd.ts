@@ -2,10 +2,10 @@ import { Command } from '@commander-js/extra-typings'
 import type { Config, SignerBackend, SubstrateNetworkConfig } from '../types'
 import { Signer } from '../signer'
 import type { SignerType } from '../enums'
-import { readConfig, getNetworkConfig, print } from '../util'
+import { readConfig, getNetworkConfig, print, checkNodeVersion } from '../util'
 import { newSignerBackend } from '../backend/backend'
 import { SubstrateStaker } from './staker'
-import type { ISubmittableResult } from '@polkadot/types/types'
+import type { ExtrinsicStatus } from '@polkadot/types/interfaces/author'
 
 export function makeSubstrateCommand (): Command {
   const substrate = new Command('substrate')
@@ -82,6 +82,9 @@ async function runTx (
   cmd: Command<[string]> | Command<[]>,
   arg: string[]
 ): Promise<Uint8Array> {
+  // https://github.com/polkadot-js/api/issues/5880
+  checkNodeVersion('v22.', 'node version v22 is faulty for polkadot api js, please downgrade')
+
   const broadcastEnabled = cmd.parent?.getOptionValue('broadcast') as boolean
   const journalEnabled: boolean = JSON.parse(cmd.parent?.getOptionValue('journal') as string)
 
@@ -90,13 +93,13 @@ async function runTx (
   const substrateStaker: SubstrateStaker = new SubstrateStaker(signerClient, config, journalEnabled)
   await substrateStaker.init()
 
-  let response: ISubmittableResult | undefined
+  let response: ExtrinsicStatus | undefined
   let errMsg: string = ''
 
   print(1, 3, 'prepare unsigned transaction')
   console.log(JSON.stringify({
     delegator: config.delegatorAddress,
-    contractId: config.validatorAddress,
+    validatorAddress: config.validatorAddress,
     messageType: msgType,
     args: arg,
     broadcast: broadcastEnabled
@@ -142,22 +145,24 @@ async function runTx (
   }
 
   print(3, 3, 'inspect transaction outcome')
-  if (response.status.isInBlock) {
-    console.log(`transaction included at blockHash ${response.status.asInBlock.toString()}`)
+  if (response.isInBlock) {
+    console.log(`transaction included at blockHash ${response.asInBlock.toString()}`)
   }
 
-  if (response.status.isInBlock) {
-    console.log(`transaction finalized at blockHash ${response.status.asFinalized.toString()}`)
+  if (response.isFinalized) {
+    console.log(`transaction finalized at blockHash ${response.asFinalized.toString()}`)
   }
 
   if (errMsg !== '') {
-    console.log(errMsg)
+    console.log('error: ' + errMsg)
   }
 
   const networkConfig = getNetworkConfig<SubstrateNetworkConfig>(config)
   if (networkConfig.blockExplorerUrl !== undefined) {
+    console.log('* transaction was (most likely) broadcasted to the network')
+    console.log("* due to unstable polkadot-js/api, you'll need to find the transaction manually and check it's status")
     console.log(
-      '\nFind TX manually here: ' +
+      '\nLink to block explorer: ' +
           networkConfig.blockExplorerUrl + '/' + config.delegatorAddress
     )
   }

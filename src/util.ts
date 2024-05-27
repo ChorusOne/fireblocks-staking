@@ -1,4 +1,5 @@
 import * as readline from 'readline'
+import * as process from 'process'
 import chalk from 'chalk'
 import { promises as fsPromises } from 'fs'
 import { type Journal, type JournalEntry, type Config } from './types'
@@ -119,4 +120,16 @@ export async function prompt (ask: string): Promise<boolean> {
 
 export function print (step: number, total: number, msg: string): void {
   console.log(chalk.green(`# [${step}/${total}] ${msg}`))
+}
+
+export function checkNodeVersion (versionPrefix: string, err?: string): void {
+  const version = process.version
+  if (version.startsWith(versionPrefix)) {
+    if (err !== undefined) {
+      console.error(err)
+    } else {
+      console.error(`Error: Node.js version ${version} is not supported.`)
+    }
+    process.exit(1)
+  }
 }

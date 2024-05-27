@@ -1,6 +1,6 @@
 import type { SignerOptions } from '@polkadot/api/submittable/types'
 import type { Signer } from '../signer'
-import type { ISubmittableResult } from '@polkadot/types/types'
+import type { ExtrinsicStatus } from '@polkadot/types/interfaces/author'
 import { journal, getNetworkConfig } from '../util'
 import type { Config, SubstrateNetworkConfig } from '../types'
 import { SubstrateFireblocksSigner } from './signer'
@@ -28,7 +28,7 @@ export class SubstrateStaker {
   }
 
   @journal('delegate')
-  async delegate (amount: string, broadcast: boolean): Promise<[ISubmittableResult, string]> {
+  async delegate (amount: string, broadcast: boolean): Promise<[ExtrinsicStatus, string]> {
     this.substrateSigner.setNote('delegate' + amount + ' to ' + this.config.delegatorAddress)
     this.substrateSigner.setBroadcast(broadcast)
 
@@ -45,7 +45,7 @@ export class SubstrateStaker {
 
   // nominate bonded amount to given validators
   @journal('nominate')
-  async nominate (broadcast: boolean): Promise<[ISubmittableResult, string]> {
+  async nominate (broadcast: boolean): Promise<[ExtrinsicStatus, string]> {
     this.substrateSigner.setNote('nominate bonded amount to ' + this.config.delegatorAddress)
     this.substrateSigner.setBroadcast(broadcast)
 
@@ -60,7 +60,7 @@ export class SubstrateStaker {
   }
 
   @journal('undelegate')
-  async undelegate (amount: string, broadcast: boolean): Promise<[ISubmittableResult, string]> {
+  async undelegate (amount: string, broadcast: boolean): Promise<[ExtrinsicStatus, string]> {
     this.substrateSigner.setNote('unstake ' + amount + ' from ' + this.config.delegatorAddress)
     this.substrateSigner.setBroadcast(broadcast)
 
@@ -75,7 +75,7 @@ export class SubstrateStaker {
   }
 
   @journal('withdraw')
-  async withdraw (broadcast: boolean): Promise<[ISubmittableResult, string]> {
+  async withdraw (broadcast: boolean): Promise<[ExtrinsicStatus, string]> {
     this.substrateSigner.setNote('withdraw all from ' + this.config.delegatorAddress)
     this.substrateSigner.setBroadcast(broadcast)
 
@@ -88,7 +88,7 @@ export class SubstrateStaker {
   }
 
   @journal('bondExtra')
-  async bondExtra (amount: string, broadcast: boolean): Promise<[ISubmittableResult, string]> {
+  async bondExtra (amount: string, broadcast: boolean): Promise<[ExtrinsicStatus, string]> {
     this.substrateSigner.setNote('bond extra ' + amount + ' to ' + this.config.delegatorAddress)
     this.substrateSigner.setBroadcast(broadcast)
 
@@ -107,7 +107,7 @@ export class SubstrateStaker {
     txCall: { section: string, method: string },
     blocks: number | undefined,
     params: any[]
-  ): Promise<[ISubmittableResult, string]> {
+  ): Promise<[ExtrinsicStatus, string]> {
     const provider = new WsProvider(this.networkConfig.rpcUrl)
     const api = await ApiPromise.create({ provider, noInitWarn: true })
 
@@ -129,29 +129,44 @@ export class SubstrateStaker {
     }
 
     const result = api.tx[txCall.section][txCall.method](...params)
-    let ret: ISubmittableResult | undefined
-    let errMsg: string = ''
 
-    const unsub = await result.signAndSend(account, options, async (response) => {
-      ret = response
+    const submittableExtrinsic = await result.signAsync(account, options)
+    console.log('\nsubmitting signed extrinsic to the blockchain...\n')
 
-      if (response.dispatchError !== undefined && response.dispatchError.isModule) {
-        const decoded = api.registry.findMetaError(response.dispatchError.asModule)
-        const { docs, name, section } = decoded
+    const status = await api.rpc.author.submitAndWatchExtrinsic(submittableExtrinsic)
 
-        errMsg = `the transaction is submitted to the blockchain but failed, error: ${section}.${name}: ${docs.join(' ')}`
-        await provider.disconnect()
-      } else {
-        if (response.status.isInBlock) {
-          await provider.disconnect()
-        } else if (response.status.isFinalized) {
-          unsub()
-        }
-      }
-    })
+    // FIXME: in ideal world and based on all the documentation I (mkaczanowski)
+    // found. The callback should return a status but it is not being called at
+    // all. This makes us oblivious of the status, meaning that we don't know if
+    // transaction went through, is in the block or failed.
+    //
+    // let ret: ISubmittableResult | undefined
+    // let errMsg: string = ''
+    // const unsub = await result.signAndSend(account, options, (response) => {
+    //   ret = response
 
-    assert(ret !== undefined, "transaction didn't return any result")
+    //   if (response.dispatchError !== undefined && response.dispatchError.isModule) {
+    //     const decoded = api.registry.findMetaError(response.dispatchError.asModule)
+    //     const { docs, name, section } = decoded
 
-    return [ret, errMsg]
+    //     errMsg = `the transaction is submitted to the blockchain but failed, error: ${section}.${name}: ${docs.join(' ')}`
+    //   } else {
+    //     if (response.status.isInBlock) {
+    //       console.log(`completed at block hash #${response.status.isInBlock}`)
+    //     } else if (response.status.isFinalized) {
+    //       console.log(`current status: ${response.status.type}`)
+    //       unsub()
+    //     }
+    //   }
+    // })
+
+    // unsubscribe
+    // unsub()
+
+    await provider.disconnect()
+
+    assert(status !== undefined, "transaction didn't return any result")
+
+    return [status, '']
   }
 }
