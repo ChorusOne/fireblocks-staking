@@ -83,7 +83,7 @@ export class SubstrateStaker {
       this.config.delegatorAddress,
       { section: 'staking', method: 'withdrawUnbonded' },
       0,
-      []
+      [null/* slashing spans */]
     )
   }
 
