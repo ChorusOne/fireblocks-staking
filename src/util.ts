@@ -103,7 +103,7 @@ export async function prompt (ask: string): Promise<boolean> {
   })
 
   try {
-    while (true) {
+    for(;;) {
       const userInput = await new Promise<string>((resolve) => {
         rl.question(ask + ' [y/n]: ', resolve)
       })
