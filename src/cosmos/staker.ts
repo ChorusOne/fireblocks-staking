@@ -3,19 +3,19 @@ import type {
   StargateClient,
   DeliverTxResponse
 } from '@cosmjs/stargate'
-import {
-  type StdSignDoc
+import type {
+  StdSignDoc
 } from '@cosmjs/amino'
-import { type Signer } from '../signer'
+import type { Signer } from '../signer'
 import { genSignedTx, genSignedMsg, genSignableTx, genDelegateOrUndelegateMsg, genBeginRedelegateMsg, genWithdrawRewardsMsg } from './tx'
 import { prompt, print, journal, getNetworkConfig } from '../util'
 import type { Config, CosmosNetworkConfig } from '../types'
-import { type EncodeObject } from '@cosmjs/proto-signing'
+import type { EncodeObject } from '@cosmjs/proto-signing'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { rawSecp256k1PubkeyToRawAddress } from '@cosmjs/amino'
 import { toBech32, fromBase64 } from '@cosmjs/encoding'
 import { newCosmosClient } from './client'
-import { type VaultAccountResponse } from 'fireblocks-sdk'
+import type { VaultAccountResponse } from 'fireblocks-sdk'
 
 export class CosmosStaker {
   private readonly signer: Signer

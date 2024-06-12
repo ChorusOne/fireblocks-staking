@@ -7,7 +7,9 @@ import type {
   TransactionResponse,
   PublicKeyInfoForVaultAccountArgs,
   PublicKeyResponse,
-  DepositAddressResponse
+  PublicKeyInformation,
+  DepositAddressResponse,
+  PublicKeyInfoArgs
 } from 'fireblocks-sdk'
 
 import type { NetworkType, RewardDestination } from './enums'
@@ -32,6 +34,7 @@ export interface Config {
   cosmos?: CosmosNetworkConfig
   near?: NearNetworkConfig
   substrate?: SubstrateNetworkConfig
+  avalanche?: AvalancheNetworkConfig
 }
 
 export interface FireblocksConfig {
@@ -101,6 +104,20 @@ export interface SubstrateNetworkConfig {
   rewardDestination: RewardDestination
 }
 
+export interface AvalancheNetworkConfig {
+  // e.g https://api.avax.network"
+  rpcUrl: string
+
+  // block explorer URL to display Transaction ID via Web UI. Example:
+  // e.g https://avascan.info/blockchain
+  blockExplorerUrl: string
+
+  // the input amount of tokens is multiplied by this value to get the amount
+  // in the smallest unit of the token. e.g.
+  //  * 1000000000 for 1 AVAX (in nAVAX)
+  denomMultiplier: number
+}
+
 export interface LocalSigner {
   // a file containing delegator mnemonic
   mnemonicPath: string
@@ -119,6 +136,8 @@ export interface SignerBackend {
   getTransactionById: (txId: string) => Promise<TransactionResponse>
 
   getPublicKeyInfoForVaultAccount: (args: PublicKeyInfoForVaultAccountArgs) => Promise<PublicKeyResponse>
+
+  getPublicKeyInfo: (args: PublicKeyInfoArgs) => Promise<PublicKeyInformation>
 
   getDepositAddresses: (vaultAccountId: string, assetId: string) => Promise<DepositAddressResponse[]>
 }

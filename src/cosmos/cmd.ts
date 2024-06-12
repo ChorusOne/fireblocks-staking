@@ -1,7 +1,7 @@
 import { Command } from '@commander-js/extra-typings'
 import type { Config, SignerBackend, CosmosNetworkConfig } from '../types'
 import { Signer } from '../signer'
-import { type SignerType } from '../enums'
+import type { SignerType } from '../enums'
 import { prompt, readConfig, getNetworkConfig, print } from '../util'
 import { newSignerBackend } from '../backend/backend'
 import { CosmosStaker } from './staker'
