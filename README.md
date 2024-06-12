@@ -85,6 +85,16 @@ Here's an example configuration for NEAR mainnet:
 }
 ```
 
+### Avalanche
+Here's an example configuration for Avalanche mainnet:
+```
+"avalanche": {
+    "rpcUrl": "https://api.avax.network",
+    "denomMultiplier": 1000000000,
+    "blockExplorerUrl": "https://avascan.info/blockchain"
+}
+```
+
 ### Substrate (Polkadot, Kusama, ...)
 Here's and example configuration for Polkadot testnet (Westend):
 ```
