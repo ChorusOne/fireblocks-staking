@@ -1,18 +1,21 @@
 import {
   PeerType,
   TransactionOperation,
-  type TransactionResponse,
-  type TransactionArguments,
   TransactionStatus,
-  type VaultAccountResponse,
-  type PublicKeyInfoForVaultAccountArgs,
-  type PublicKeyResponse,
-  type PublicKeyInformation,
-  type PublicKeyInfoArgs
 } from 'fireblocks-sdk'
+import type {
+  TransactionResponse,
+  TransactionArguments,
+  VaultAccountResponse,
+  PublicKeyInfoForVaultAccountArgs,
+  PublicKeyResponse,
+  PublicKeyInformation,
+  PublicKeyInfoArgs
+} from 'fireblocks-sdk'
+
 import { print } from './util'
 
-import { type SignerBackend } from './types'
+import type { SignerBackend } from './types'
 
 export class Signer {
   readonly signerBackend: SignerBackend
@@ -44,10 +47,10 @@ export class Signer {
 
     // https://developers.fireblocks.com/docs/raw-message-signing
     print(2, 3, 'wait for the TX signature from the remote signer')
-    let { status, id } = await this.signerBackend.createTransaction(args)
+    const { id } = await this.signerBackend.createTransaction(args)
 
     let txInfo = await this.signerBackend.getTransactionById(id)
-    status = txInfo.status
+    let status = txInfo.status
 
     const states = [
       TransactionStatus.COMPLETED,
@@ -65,7 +68,7 @@ export class Signer {
         console.error('probing remote signer failed', err)
       }
 
-      await new Promise((resolve, reject) => setTimeout(resolve, 1000))
+      await new Promise((resolve, _) => setTimeout(resolve, 1000))
     }
 
     const details = txInfo.subStatus === '' ? 'none' : txInfo.subStatus
