@@ -45,11 +45,12 @@ export class AvalancheStaker {
     const pkCompressed = Buffer.from(publicKeyConvert(pkUncompressed, true))
 
     // generate C-Chain and P-Chain addresses
+    const hrp = this.networkConfig.hrp
     const addrBytes = secp256k1.publicKeyBytesToAddress(pkCompressed)
     const cAddr = '0x' + Buffer.from(secp256k1.publicKeyToEthAddress(pkUncompressed)).toString('hex')
-    const pAddr = utils.format('P', 'fuji', addrBytes)
-    const xAddr = utils.format('X', 'fuji', addrBytes)
-    const coreEthAddr = utils.format('C', 'fuji', addrBytes)
+    const pAddr = utils.format('P', hrp, addrBytes)
+    const xAddr = utils.format('X', hrp, addrBytes)
+    const coreEthAddr = utils.format('C', hrp, addrBytes)
 
     if (cAddr.toLowerCase() !== this.config.delegatorAddress.toLowerCase()) {
       throw new Error(`the delegator address ${this.config.delegatorAddress} in the config does not match the address from the vault: ${cAddr}`)

@@ -90,6 +90,7 @@ Here's an example configuration for Avalanche mainnet:
 ```
 "avalanche": {
     "rpcUrl": "https://api.avax.network",
+    "hrp": "avax",
     "denomMultiplier": 1000000000,
     "blockExplorerUrl": "https://avascan.info/blockchain"
 }

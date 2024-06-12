@@ -108,6 +108,9 @@ export interface AvalancheNetworkConfig {
   // e.g https://api.avax.network"
   rpcUrl: string
 
+  // e.g avax for mainnet, fuji for testnet
+  hrp: string
+
   // block explorer URL to display Transaction ID via Web UI. Example:
   // e.g https://avascan.info/blockchain
   blockExplorerUrl: string

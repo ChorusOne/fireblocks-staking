@@ -35,6 +35,7 @@ Ensure you have generated your Fireblocks Raw Signing API keys (`./fireblocks_ap
 
     "avalanche": {
         "rpcUrl": "https://api.avax.network",
+        "hrp": "avax",
         "denomMultiplier": 1000000000,
         "blockExplorerUrl": "https://avascan.info/blockchain"
     }
