@@ -2,6 +2,7 @@ import { Command } from '@commander-js/extra-typings'
 import { makeCosmosCommand } from './cosmos/cmd'
 import { makeNearCommand } from './near/cmd'
 import { makeSubstrateCommand } from './substrate/cmd'
+import { makeAvalancheCommand } from './avalanche/cmd'
 
 const program = new Command()
 
@@ -18,7 +19,8 @@ program
 
 program.addCommand(makeCosmosCommand())
 program.addCommand(makeNearCommand())
-program.addCommand(makeSubstrateCommand());
+program.addCommand(makeSubstrateCommand())
+program.addCommand(makeAvalancheCommand());
 
 (async () => {
   await program.parseAsync()

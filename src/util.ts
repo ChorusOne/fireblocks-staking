@@ -88,6 +88,11 @@ export function getNetworkConfig<T> (cfg: Config): T {
         throw new Error('substrate configuration is missing')
       }
       return cfg.substrate as T
+    case NetworkType.AVALANCHE:
+      if (cfg.avalanche === undefined) {
+        throw new Error('avalanche configuration is missing')
+      }
+      return cfg.avalanche as T
   }
 }
 

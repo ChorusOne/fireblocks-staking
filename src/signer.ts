@@ -6,7 +6,9 @@ import {
   TransactionStatus,
   type VaultAccountResponse,
   type PublicKeyInfoForVaultAccountArgs,
-  type PublicKeyResponse
+  type PublicKeyResponse,
+  type PublicKeyInformation,
+  type PublicKeyInfoArgs
 } from 'fireblocks-sdk'
 import { print } from './util'
 
@@ -102,12 +104,18 @@ export class Signer {
     }
 
     const pubKeyResponse: PublicKeyResponse = await this.signerBackend.getPublicKeyInfoForVaultAccount(pubKeyArgs)
-    const expectedAlgorithm = 'MPC_EDDSA_ED25519'
-    if (pubKeyResponse.algorithm !== expectedAlgorithm) {
-      throw new Error(`expected algorithm is not ${expectedAlgorithm} but ${pubKeyResponse.algorithm}`)
-    }
+
+    // TODO: figure out how to check the algorithm based on the assetId
+    // const expectedAlgorithm = 'MPC_ECDSA_SECP256K1'
+    // if (pubKeyResponse.algorithm !== expectedAlgorithm) {
+    //   throw new Error(`expected algorithm is not ${expectedAlgorithm} but ${pubKeyResponse.algorithm}`)
+    // }
 
     return pubKeyResponse.publicKey
+  }
+
+  async getPublicKeyInfo (args: PublicKeyInfoArgs): Promise<PublicKeyInformation> {
+    return await this.signerBackend.getPublicKeyInfo(args)
   }
 
   async getDepositAddress (vaultAccountId: string, assetId: string): Promise<string> {
