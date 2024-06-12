@@ -215,7 +215,8 @@ export class AvalancheStaker {
       throw new Error('transaction signing aborted by user')
     }
 
-    const txInfo = await this.signer.sign(this.vault, this.config.fireblocks.assetId, this.config.delegatorAddress, hexMsg, '')
+    const note = JSON.stringify(tx.toJSON(), null, 2)
+    const txInfo = await this.signer.sign(this.vault, this.config.fireblocks.assetId, this.config.delegatorAddress, hexMsg, note)
 
     if (txInfo.signedMessages === undefined || txInfo.signedMessages?.length === 0) {
       throw new Error("fireblocks didn't return any signed message, but it should")
