@@ -3,7 +3,7 @@ import type { FinalExecutionOutcome } from '@near-js/types'
 import { parseNearAmount } from 'near-api-js/lib/utils/format'
 import type { Signer } from '../signer'
 import { journal, getNetworkConfig } from '../util'
-import { type Config, type NearNetworkConfig } from '../types'
+import type { Config, NearNetworkConfig } from '../types'
 import { NEARFireblocksSigner } from './signer'
 
 // NOTE: This would be the proper way of calling the contract, but it doesn't work

@@ -1,10 +1,11 @@
 import { sha256 } from 'js-sha256'
 import { encode } from 'bs58'
 import { Signer as AbstractSigner } from 'near-api-js'
-import { PublicKey, type Signature } from 'near-api-js/lib/utils/key_pair'
-import { type Signer } from '../signer'
-import { type Config } from '../types'
-import { type VaultAccountResponse } from 'fireblocks-sdk'
+import type { Signature } from 'near-api-js/lib/utils/key_pair'
+import { PublicKey } from 'near-api-js/lib/utils/key_pair'
+import type { Signer } from '../signer'
+import type { Config } from '../types'
+import type { VaultAccountResponse } from 'fireblocks-sdk'
 
 export class NEARFireblocksSigner extends AbstractSigner {
   private readonly signer: Signer
@@ -34,7 +35,7 @@ export class NEARFireblocksSigner extends AbstractSigner {
    * @param accountId accountId to retrieve from.
    * @param networkId The targeted network. (ex. default, betanet, etc…)
    */
-  async createKey (accountId: string, networkId?: string): Promise<PublicKey> {
+  async createKey (_accountId: string, _networkId?: string): Promise<PublicKey> {
     throw new Error('create key is not supported')
   }
 
@@ -43,7 +44,7 @@ export class NEARFireblocksSigner extends AbstractSigner {
    * @param accountId accountId to retrieve from.
    * @param networkId The targeted network. (ex. default, betanet, etc…)
    */
-  async getPublicKey (accountId?: string, networkId?: string): Promise<PublicKey> {
+  async getPublicKey (_accountId?: string, _networkId?: string): Promise<PublicKey> {
     return this.publicKey
   }
 
@@ -53,7 +54,7 @@ export class NEARFireblocksSigner extends AbstractSigner {
    * @param accountId accountId to use for signing.
    * @param networkId The targeted network. (ex. default, betanet, etc…)
    */
-  async signMessage (message: Uint8Array, accountId?: string, networkId?: string): Promise<Signature> {
+  async signMessage (message: Uint8Array, _accountId?: string, _networkId?: string): Promise<Signature> {
     const msgBuffer = Buffer.from(message)
     const msgHash = sha256.create().update(msgBuffer).hex()
 

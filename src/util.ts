@@ -2,7 +2,7 @@ import * as readline from 'readline'
 import * as process from 'process'
 import chalk from 'chalk'
 import { promises as fsPromises } from 'fs'
-import { type Journal, type JournalEntry, type Config } from './types'
+import type { Journal, JournalEntry, Config } from './types'
 import { NetworkType } from './enums'
 
 async function fileExists (path: string): Promise<boolean> {

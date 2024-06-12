@@ -1,14 +1,9 @@
-import {
-  type SignedMessageResponse,
-  type VaultAccountResponse
+import type {
+  SignedMessageResponse,
+  VaultAccountResponse
 } from 'fireblocks-sdk'
 import {
-  coin, type Coin,
-  type MsgDelegateEncodeObject,
-  type MsgUndelegateEncodeObject,
-  type MsgBeginRedelegateEncodeObject,
-  type MsgWithdrawDelegatorRewardEncodeObject,
-  type AminoConverters,
+  coin,
   AminoTypes,
   createStakingAminoConverters,
   createAuthzAminoConverters,
@@ -19,7 +14,15 @@ import {
   createVestingAminoConverters,
   defaultRegistryTypes
 } from '@cosmjs/stargate'
-import { type Signer } from '../signer'
+import type {
+  Coin,
+  MsgDelegateEncodeObject,
+  MsgUndelegateEncodeObject,
+  MsgBeginRedelegateEncodeObject,
+  MsgWithdrawDelegatorRewardEncodeObject,
+  AminoConverters
+} from '@cosmjs/stargate'
+import type { Signer } from '../signer'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { fromBase64, toBase64 } from '@cosmjs/encoding'
 import { SignMode } from 'cosmjs-types/cosmos/tx/signing/v1beta1/signing'
@@ -32,20 +35,21 @@ import { getNetworkConfig } from '../util'
 
 import {
   Registry,
-  type TxBodyEncodeObject,
-  type EncodeObject,
   encodePubkey,
   makeAuthInfoBytes
+} from '@cosmjs/proto-signing'
+import type {
+  TxBodyEncodeObject,
+  EncodeObject
 } from '@cosmjs/proto-signing'
 
 import {
   makeSignDoc as makeSignDocAmino,
-  type StdFee,
-  type StdSignDoc,
   serializeSignDoc,
   encodeSecp256k1Pubkey,
   encodeSecp256k1Signature
 } from '@cosmjs/amino'
+import type { StdFee, StdSignDoc } from '@cosmjs/amino'
 
 function createDefaultTypes (): AminoConverters {
   return {

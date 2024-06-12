@@ -30,7 +30,7 @@ export class SubstrateFireblocksSigner implements SubstrateSigner {
   /**
    * @description signs a raw payload, only the bytes data as supplied
    */
-  async signRaw ({ data, type }: SignerPayloadRaw): Promise<SignerResult> {
+  async signRaw ({ data }: SignerPayloadRaw): Promise<SignerResult> {
     data = (data.length > (256 + 1) * 2) ? blake2AsHex(data) : data
 
     const txInfo = await this.signer.sign(

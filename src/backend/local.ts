@@ -1,28 +1,27 @@
 import { promises as fsPromises } from 'fs'
 import { Secp256k1, Bip39, EnglishMnemonic, Slip10, Slip10Curve } from '@cosmjs/crypto'
-import { type SignerBackend } from '../types'
+import type { SignerBackend } from '../types'
+import type {
+  PagedVaultAccountsRequestFilters,
+  PagedVaultAccountsResponse,
+  TransactionArguments,
+  RequestOptions,
+  CreateTransactionResponse,
+  TransactionResponse,
+  TransferPeerPathResponse,
+  PublicKeyInfoForVaultAccountArgs,
+  PublicKeyResponse,
+  DepositAddressResponse,
+  PublicKeyInformation,
+  PublicKeyInfoArgs,
+} from 'fireblocks-sdk'
 import {
-  type PagedVaultAccountsRequestFilters,
-  type PagedVaultAccountsResponse,
-  type TransactionArguments,
-  type RequestOptions,
-  type CreateTransactionResponse,
-  type TransactionResponse,
-  type TransferPeerPathResponse,
-  type PublicKeyInfoForVaultAccountArgs,
-  type PublicKeyResponse,
-  type DepositAddressResponse,
-  type PublicKeyInformation,
-  type PublicKeyInfoArgs,
   TransactionStatus,
   PeerType
 } from 'fireblocks-sdk'
 
 import { makeCosmoshubPath } from '@cosmjs/proto-signing'
-
-import {
-  type Secp256k1HdWalletOptions
-} from '@cosmjs/amino'
+import type { Secp256k1HdWalletOptions } from '@cosmjs/amino'
 
 export class LocalSignerBackend implements SignerBackend {
   private readonly pubkey: Uint8Array
@@ -47,7 +46,7 @@ export class LocalSignerBackend implements SignerBackend {
   }
 
   public async getVaultAccountsWithPageInfo (
-    pagedVaultAccountsRequestFilters: PagedVaultAccountsRequestFilters
+    _pagedVaultAccountsRequestFilters: PagedVaultAccountsRequestFilters
   ): Promise<PagedVaultAccountsResponse> {
     return await Promise.resolve({
       accounts: [
@@ -61,7 +60,7 @@ export class LocalSignerBackend implements SignerBackend {
 
   public async createTransaction (
     transactionArguments: TransactionArguments,
-    requestOptions?: RequestOptions
+    _requestOptions?: RequestOptions
   ): Promise<CreateTransactionResponse> {
     interface inner {
       rawMessageData: {
@@ -134,15 +133,15 @@ export class LocalSignerBackend implements SignerBackend {
     })
   }
 
-  public async getPublicKeyInfo (args: PublicKeyInfoArgs): Promise<PublicKeyInformation> {
+  public async getPublicKeyInfo (_args: PublicKeyInfoArgs): Promise<PublicKeyInformation> {
     throw new Error('method not implemented')
   }
 
-  public async getPublicKeyInfoForVaultAccount (args: PublicKeyInfoForVaultAccountArgs): Promise<PublicKeyResponse> {
+  public async getPublicKeyInfoForVaultAccount (_args: PublicKeyInfoForVaultAccountArgs): Promise<PublicKeyResponse> {
     throw new Error('method not implemented')
   }
 
-  public async getDepositAddresses (vaultAccountId: string, assetId: string): Promise<DepositAddressResponse[]> {
+  public async getDepositAddresses (_vaultAccountId: string, _assetId: string): Promise<DepositAddressResponse[]> {
     throw new Error('method not implemented')
   }
 }
