@@ -1,3 +1,6 @@
+# ⚠️ Deprecation Notice ⚠️
+This repository is now archived and migrated to [chorus-one-sdk](https://github.com/ChorusOne/chorus-one-sdk/tree/main/packages/staking-cli) repository.
+
 # Fireblocks Staking CLI
 The Fireblocks Staking CLI is a tool designed to simplify the process of staking (or unstaking) tokens on cosmos-sdk based networks such as Celestia and others.
 
